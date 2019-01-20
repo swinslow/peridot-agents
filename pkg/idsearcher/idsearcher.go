@@ -2,8 +2,8 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -18,16 +18,13 @@ import (
 // itself, but instead uses signals back to the separate sender goroutine
 // to set job status information.
 func (i *idsearcher) runAgent(
+	ctx context.Context,
 	cfg agent.JobConfig,
-	jobExited <-chan interface{},
 	setStatus chan<- statusUpdate,
-	cancelWanted <-chan interface{},
 ) {
 	// now that we exist, we own setStatus and are responsible for
 	// closing it when we are done
 	defer close(setStatus)
-
-	log.Printf("== agent IN runAgent, cfg %#v\n", cfg)
 
 	// set up package name based on job ID
 	// FIXME consider making package name configurable
@@ -88,8 +85,6 @@ func (i *idsearcher) runAgent(
 		},
 		// FIXME consider making Builder... and SearcherPathsIgnored configurable
 	}
-
-	log.Printf("== agent IN runAgent, stage 2, searchConfig %#v\n", searchConfig)
 
 	// we're all configured; set status as running
 	setStatus <- statusUpdate{run: agent.JobRunStatus_RUNNING}
