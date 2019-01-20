@@ -4,6 +4,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -22,6 +23,8 @@ func (i *idsearcher) runAgent(
 	cfg agent.JobConfig,
 	setStatus chan<- statusUpdate,
 ) {
+	defer log.Printf("==> CLOSING runAgent")
+
 	// now that we exist, we own setStatus and are responsible for
 	// closing it when we are done
 	defer close(setStatus)

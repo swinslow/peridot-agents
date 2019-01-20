@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/swinslow/peridot-core/pkg/agent"
@@ -52,6 +53,7 @@ type rptType struct {
 // NewJob is the bidirectional streaming RPC that communicates with
 // the Controller.
 func (i *idsearcher) NewJob(stream agent.Agent_NewJobServer) error {
+	defer log.Printf("==> CLOSING NewJob")
 	// now in a new, separate goroutine to handle this stream.
 
 	// this main goroutine is responsible for tracking the job's status
@@ -142,6 +144,24 @@ func (i *idsearcher) NewJob(stream agent.Agent_NewJobServer) error {
 	// we still own setStatus and should close it
 	if !createdAgent {
 		close(setStatus)
+	} else {
+		// need to make sure the setStatus channel gets unblocked
+		// before we exit
+		for {
+			_, ok := <-setStatus
+			if !ok {
+				break
+			}
+		}
+	}
+
+	// also need to make sure the recvReq channel gets unblocked
+	// before we exit
+	for {
+		_, ok := <-recvReq
+		if !ok {
+			break
+		}
 	}
 
 	return nil

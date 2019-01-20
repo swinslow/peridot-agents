@@ -29,6 +29,7 @@ func (i *idsearcher) sender(
 	stream *agent.Agent_NewJobServer,
 	rptWanted <-chan rptType,
 ) {
+	defer log.Printf("==> CLOSING sender")
 	// these are flags for when to send a report and for when we are exiting
 	var exiting bool
 

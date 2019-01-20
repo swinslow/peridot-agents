@@ -14,6 +14,7 @@ func (i *idsearcher) receiver(
 	stream *agent.Agent_NewJobServer,
 	recvReq chan<- reqMsg,
 ) {
+	defer log.Printf("==> CLOSING receiver")
 	// receiver owns recvReq
 	defer close(recvReq)
 
