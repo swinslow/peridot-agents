@@ -28,8 +28,6 @@ func main() {
 		agentConfig: "",
 	})
 
-	// FIXME is reflection needed? If so, for what?
-
 	// start grpc server
 	if err := server.Serve(lis); err != nil {
 		log.Fatalf("couldn't start server: %v", err)
