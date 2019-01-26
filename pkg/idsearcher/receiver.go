@@ -24,7 +24,7 @@ func (i *idsearcher) receiver(
 	// FIXME determine whether it also needs to check ctx.Done() periodically
 	for !exiting {
 		in, err := (*stream).Recv()
-		log.Printf("== agent RECV %#v\n", in)
+		log.Printf("== agent RECV %s\n", in.String())
 		if err == io.EOF {
 			// the controller closed the channel
 			exiting = true
