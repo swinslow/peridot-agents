@@ -14,6 +14,18 @@ import (
 	"github.com/swinslow/peridot-core/pkg/agent"
 )
 
+// setStatusError is a helper function to send a statusUpdate
+// to the setStatus channel with ERROR status, and with the specified
+// error message.
+func setStatusError(setStatus chan<- statusUpdate, msg string) {
+	setStatus <- statusUpdate{
+		run:      agent.JobRunStatus_STOPPED,
+		health:   agent.JobHealthStatus_ERROR,
+		now:      time.Now(),
+		errorMsg: msg,
+	}
+}
+
 // runAgent is the function that actually carries out the substantive
 // action of the agent, for this job. It does not do any gRPC communication
 // itself, but instead uses signals back to the separate sender goroutine
@@ -40,12 +52,7 @@ func (i *idsearcher) runAgent(
 			// FIXME for now we'll only search the first path, even if there are multiple
 			// check that at least one path is specified for primary input
 			if len(codeInput.Paths) < 1 {
-				setStatus <- statusUpdate{
-					run:      agent.JobRunStatus_STOPPED,
-					health:   agent.JobHealthStatus_ERROR,
-					now:      time.Now(),
-					errorMsg: "no codeInput paths specified for primary source",
-				}
+				setStatusError(setStatus, "no codeInput paths specified for primary source")
 				return
 			}
 			packageRootDir = codeInput.Paths[0]
@@ -55,24 +62,14 @@ func (i *idsearcher) runAgent(
 	// check that we found a primary input with a path
 	if packageRootDir == "" {
 		// we didn't; error out
-		setStatus <- statusUpdate{
-			run:      agent.JobRunStatus_STOPPED,
-			health:   agent.JobHealthStatus_ERROR,
-			now:      time.Now(),
-			errorMsg: "no primary codeInputs specified",
-		}
+		setStatusError(setStatus, "no primary codeInputs specified")
 		return
 	}
 
 	// check that we got a non-empty output directory
 	if cfg.SpdxOutputDir == "" {
 		// we didn't; error out
-		setStatus <- statusUpdate{
-			run:      agent.JobRunStatus_STOPPED,
-			health:   agent.JobHealthStatus_ERROR,
-			now:      time.Now(),
-			errorMsg: "no spdxOutputDir specified",
-		}
+		setStatusError(setStatus, "no spdxOutputDir specified")
 		return
 	}
 
@@ -96,12 +93,7 @@ func (i *idsearcher) runAgent(
 	doc, err := sid.BuildIDsDocument(packageName, packageRootDir, searchConfig)
 	if err != nil {
 		// searcher failed for some reason; error out
-		setStatus <- statusUpdate{
-			run:      agent.JobRunStatus_STOPPED,
-			health:   agent.JobHealthStatus_ERROR,
-			now:      time.Now(),
-			errorMsg: fmt.Sprintf("tools-golang/idsearcher failed: %v", err),
-		}
+		setStatusError(setStatus, fmt.Sprintf("tools-golang/idsearcher failed: %v", err))
 		return
 	}
 
@@ -109,12 +101,7 @@ func (i *idsearcher) runAgent(
 	w, err := os.Create(fileOut)
 	if err != nil {
 		// can't open file to write SPDX document to disk; error out
-		setStatus <- statusUpdate{
-			run:      agent.JobRunStatus_STOPPED,
-			health:   agent.JobHealthStatus_ERROR,
-			now:      time.Now(),
-			errorMsg: fmt.Sprintf("can't open file to write SPDX document to disk: %v", err),
-		}
+		setStatusError(setStatus, fmt.Sprintf("can't open file to write SPDX document to disk: %v", err))
 		return
 	}
 	defer w.Close()
@@ -122,12 +109,7 @@ func (i *idsearcher) runAgent(
 	err = tvsaver.Save2_1(doc, w)
 	if err != nil {
 		// can't write SPDX document to disk; error out
-		setStatus <- statusUpdate{
-			run:      agent.JobRunStatus_STOPPED,
-			health:   agent.JobHealthStatus_ERROR,
-			now:      time.Now(),
-			errorMsg: fmt.Sprintf("can't write SPDX document to disk: %v", err),
-		}
+		setStatusError(setStatus, fmt.Sprintf("can't write SPDX document to disk: %v", err))
 		return
 	}
 
