@@ -2,3 +2,4 @@
 .DS_Store
 .vscode
 pkg/idsearcher/idsearcher
+pkg/retrieve-github/retrieve-github
