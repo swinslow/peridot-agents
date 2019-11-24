@@ -30,7 +30,6 @@ type statusCurrent struct {
 	started        time.Time
 	finished       time.Time
 	outputMessages string
-	errorMessages  string
 }
 
 type statusUpdate struct {
@@ -38,7 +37,6 @@ type statusUpdate struct {
 	health    status.Health
 	now       time.Time
 	outputMsg string
-	errorMsg  string
 }
 
 type rptType struct {

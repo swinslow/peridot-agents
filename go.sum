@@ -48,6 +48,8 @@ github.com/src-d/gcfg v1.4.0/go.mod h1:p/UMsR43ujA89BJY9duynAwIpvqEujIH/jFlfL7jW
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/objx v0.2.0/go.mod h1:qt09Ya8vawLte6SNmTgCsAVtYtaKzEcn8ATUoHMkEqE=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
+github.com/swinslow/peridot-core v0.0.0-20190331181940-f89ef11b4309 h1:DZDLh3uILEpGlDokVx9rxMBRhHmpAGnCTd868omAVhw=
+github.com/swinslow/peridot-core v0.0.0-20190331181940-f89ef11b4309/go.mod h1:r6LoA3mNiWXgQctqtT09b0c5MMJnLwYKjeJoqreQ25I=
 github.com/swinslow/peridot-db v0.0.0-20191113003147-a66cd2e9bcab h1:nVwwId9AMEERAKahBEQjrPz6uToHAJKoTqhGuTu6gzY=
 github.com/swinslow/peridot-db v0.0.0-20191113003147-a66cd2e9bcab/go.mod h1:/qv8Hgw22S/OZUvY0H9C1DJ9lHc1zUwmlywiN4DAN30=
 github.com/swinslow/peridot-jobrunner v0.0.0-20191113030210-15442c3fca6b h1:ZjANUKuMwQjolps2TePE9dpATq7x9a0t+UfYMBNS9Es=

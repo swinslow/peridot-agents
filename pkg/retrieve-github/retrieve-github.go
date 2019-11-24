@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/swinslow/peridot-jobrunner/pkg/agent"
+	"github.com/swinslow/peridot-jobrunner/pkg/status"
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
@@ -18,10 +19,10 @@ import (
 // error message.
 func setStatusError(setStatus chan<- statusUpdate, msg string) {
 	setStatus <- statusUpdate{
-		run:      agent.JobRunStatus_STOPPED,
-		health:   agent.JobHealthStatus_ERROR,
-		now:      time.Now(),
-		errorMsg: msg,
+		run:       status.Status_STOPPED,
+		health:    status.Health_ERROR,
+		now:       time.Now(),
+		outputMsg: msg,
 	}
 }
 
@@ -126,7 +127,7 @@ func (ag *retrieveGithub) runAgent(
 	// }
 
 	// we're all configured; set status as running
-	setStatus <- statusUpdate{run: agent.JobRunStatus_RUNNING}
+	setStatus <- statusUpdate{run: status.Status_RUNNING}
 
 	// clone the repo
 	srcURL := getURLToRepo(org, repo)
@@ -163,7 +164,7 @@ func (ag *retrieveGithub) runAgent(
 
 	// success!
 	setStatus <- statusUpdate{
-		run: agent.JobRunStatus_STOPPED,
+		run: status.Status_STOPPED,
 		now: time.Now(),
 	}
 }

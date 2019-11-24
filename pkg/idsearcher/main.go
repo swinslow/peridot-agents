@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	port = ":9001"
+	port = ":3011"
 )
 
 func main() {
@@ -23,10 +23,7 @@ func main() {
 
 	// create and register new GRPC server for agent
 	server := grpc.NewServer()
-	agent.RegisterAgentServer(server, &idsearcher{
-		name:        "idsearcher",
-		agentConfig: "",
-	})
+	agent.RegisterAgentServer(server, &idsearcher{})
 
 	// start grpc server
 	if err := server.Serve(lis); err != nil {

@@ -38,8 +38,6 @@ func (ag *retrieveGithub) receiver(
 
 		// what type of controller message was this?
 		switch x := in.Cm.(type) {
-		case *agent.ControllerMsg_Describe:
-			recvReq <- reqMsg{t: reqDescribe}
 		case *agent.ControllerMsg_Start:
 			recvReq <- reqMsg{t: reqStart, cfg: x.Start.Config}
 		case *agent.ControllerMsg_Status:

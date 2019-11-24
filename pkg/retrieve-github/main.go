@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	port = ":9002"
+	port = ":3012"
 )
 
 func main() {
@@ -23,10 +23,7 @@ func main() {
 
 	// create and register new GRPC server for agent
 	server := grpc.NewServer()
-	agent.RegisterAgentServer(server, &retrieveGithub{
-		name:        "retrieve-github",
-		agentConfig: "",
-	})
+	agent.RegisterAgentServer(server, &retrieveGithub{})
 
 	// start grpc server
 	if err := server.Serve(lis); err != nil {

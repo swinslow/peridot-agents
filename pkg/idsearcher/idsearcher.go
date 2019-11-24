@@ -12,6 +12,7 @@ import (
 	sid "github.com/spdx/tools-golang/v0/idsearcher"
 	"github.com/spdx/tools-golang/v0/tvsaver"
 	"github.com/swinslow/peridot-jobrunner/pkg/agent"
+	"github.com/swinslow/peridot-jobrunner/pkg/status"
 )
 
 // setStatusError is a helper function to send a statusUpdate
@@ -19,10 +20,10 @@ import (
 // error message.
 func setStatusError(setStatus chan<- statusUpdate, msg string) {
 	setStatus <- statusUpdate{
-		run:      agent.JobRunStatus_STOPPED,
-		health:   agent.JobHealthStatus_ERROR,
-		now:      time.Now(),
-		errorMsg: msg,
+		run:       status.Status_STOPPED,
+		health:    status.Health_ERROR,
+		now:       time.Now(),
+		outputMsg: msg,
 	}
 }
 
@@ -49,13 +50,7 @@ func (i *idsearcher) runAgent(
 	var packageRootDir string
 	for _, codeInput := range cfg.CodeInputs {
 		if codeInput.Source == "primary" {
-			// FIXME for now we'll only search the first path, even if there are multiple
-			// check that at least one path is specified for primary input
-			if len(codeInput.Paths) < 1 {
-				setStatusError(setStatus, "no codeInput paths specified for primary source")
-				return
-			}
-			packageRootDir = codeInput.Paths[0]
+			packageRootDir = codeInput.Path
 		}
 	}
 
@@ -87,7 +82,7 @@ func (i *idsearcher) runAgent(
 	}
 
 	// we're all configured; set status as running
-	setStatus <- statusUpdate{run: agent.JobRunStatus_RUNNING}
+	setStatus <- statusUpdate{run: status.Status_RUNNING}
 
 	// build the SPDX document
 	doc, err := sid.BuildIDsDocument(packageName, packageRootDir, searchConfig)
@@ -115,7 +110,7 @@ func (i *idsearcher) runAgent(
 
 	// success!
 	setStatus <- statusUpdate{
-		run: agent.JobRunStatus_STOPPED,
+		run: status.Status_STOPPED,
 		now: time.Now(),
 	}
 }

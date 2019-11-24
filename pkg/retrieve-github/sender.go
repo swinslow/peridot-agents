@@ -8,35 +8,8 @@ import (
 	"github.com/swinslow/peridot-jobrunner/pkg/agent"
 )
 
-func (ag *retrieveGithub) getDescribeReport() *agent.DescribeReport {
-	return &agent.DescribeReport{
-		Name:        ag.name,
-		Type:        "retrieve-github",
-		AgentConfig: ag.agentConfig,
-		Capabilities: []string{
-			"codewriter",
-		},
-		Knownkvs: []*agent.DescribeReport_KVMeaning{
-			&agent.DescribeReport_KVMeaning{Key: "org", Meaning: "GitHub org where repo is located"},
-			&agent.DescribeReport_KVMeaning{Key: "repo", Meaning: "GitHub repo to retrieve"},
-			&agent.DescribeReport_KVMeaning{Key: "commit", Meaning: "commit in repo to be used; mutually exclusive with 'branch'"},
-			&agent.DescribeReport_KVMeaning{Key: "branch", Meaning: "branch in repo to be used; mutually exclusive with 'commit'"},
-		},
-	}
-}
-
 // sendMsg is responsible for actually sending the applicable message
 func (ag *retrieveGithub) sendMsg(stream *agent.Agent_NewJobServer, mw *rptType) error {
-	if mw.dRpt {
-		// send back a DescribeReport now
-		rpt := ag.getDescribeReport()
-		am := &agent.AgentMsg{Am: &agent.AgentMsg_Describe{Describe: rpt}}
-		log.Printf("== agent SEND Describe %s\n", rpt.String())
-		if err := (*stream).Send(am); err != nil {
-			// error in sending gRPC message; fail handler
-			return err
-		}
-	}
 	if mw.sRpt {
 		// send back a StatusReport now
 		rpt := &agent.StatusReport{
@@ -45,7 +18,6 @@ func (ag *retrieveGithub) sendMsg(stream *agent.Agent_NewJobServer, mw *rptType)
 			TimeStarted:    mw.status.started.Unix(),
 			TimeFinished:   mw.status.finished.Unix(),
 			OutputMessages: mw.status.outputMessages,
-			ErrorMessages:  mw.status.errorMessages,
 		}
 		am := &agent.AgentMsg{Am: &agent.AgentMsg_Status{Status: rpt}}
 		log.Printf("== agent SEND Status %s\n", rpt.String())

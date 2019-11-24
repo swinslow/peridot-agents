@@ -17,10 +17,10 @@ import (
 // error message.
 func setStatusError(setStatus chan<- statusUpdate, msg string) {
 	setStatus <- statusUpdate{
-		run:      status.Status_STOPPED,
-		health:   status.Health_ERROR,
-		now:      time.Now(),
-		errorMsg: msg,
+		run:       status.Status_STOPPED,
+		health:    status.Health_ERROR,
+		now:       time.Now(),
+		outputMsg: msg,
 	}
 }
 
