@@ -9,7 +9,7 @@ import (
 	"github.com/swinslow/peridot-jobrunner/pkg/agent"
 )
 
-func (ag *retrieveGithub) receiver(
+func (n *nop) receiver(
 	ctx context.Context,
 	stream *agent.Agent_NewJobServer,
 	recvReq chan<- reqMsg,
@@ -38,8 +38,6 @@ func (ag *retrieveGithub) receiver(
 
 		// what type of controller message was this?
 		switch x := in.Cm.(type) {
-		case *agent.ControllerMsg_Describe:
-			recvReq <- reqMsg{t: reqDescribe}
 		case *agent.ControllerMsg_Start:
 			recvReq <- reqMsg{t: reqStart, cfg: x.Start.Config}
 		case *agent.ControllerMsg_Status:

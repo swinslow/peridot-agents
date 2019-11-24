@@ -7,18 +7,15 @@ import (
 	"time"
 
 	"github.com/swinslow/peridot-jobrunner/pkg/agent"
+	"github.com/swinslow/peridot-jobrunner/pkg/status"
 )
 
-type idsearcher struct {
-	name        string
-	agentConfig string
-}
+type nop struct{}
 
 type reqType uint8
 
 const (
-	reqDescribe = reqType(iota)
-	reqStart
+	reqStart = reqType(iota)
 	reqStatus
 )
 
@@ -28,8 +25,8 @@ type reqMsg struct {
 }
 
 type statusCurrent struct {
-	run            agent.JobRunStatus
-	health         agent.JobHealthStatus
+	run            status.Status
+	health         status.Health
 	started        time.Time
 	finished       time.Time
 	outputMessages string
@@ -37,32 +34,30 @@ type statusCurrent struct {
 }
 
 type statusUpdate struct {
-	run       agent.JobRunStatus
-	health    agent.JobHealthStatus
+	run       status.Status
+	health    status.Health
 	now       time.Time
 	outputMsg string
 	errorMsg  string
 }
 
 type rptType struct {
-	dRpt   bool
 	sRpt   bool
 	status statusCurrent
 }
 
 // NewJob is the bidirectional streaming RPC that communicates with
 // the Controller.
-func (i *idsearcher) NewJob(stream agent.Agent_NewJobServer) error {
+func (n *nop) NewJob(stream agent.Agent_NewJobServer) error {
 	defer log.Printf("==> CLOSING NewJob")
 	// now in a new, separate goroutine to handle this stream.
 
 	// this main goroutine is responsible for tracking the job's status
-	status := statusCurrent{
-		run:            agent.JobRunStatus_STARTUP,
-		health:         agent.JobHealthStatus_OK,
+	st := statusCurrent{
+		run:            status.Status_STARTUP,
+		health:         status.Health_OK,
 		started:        time.Now(),
 		outputMessages: "",
-		errorMessages:  "",
 	}
 
 	// create context for child goroutines
@@ -83,10 +78,10 @@ func (i *idsearcher) NewJob(stream agent.Agent_NewJobServer) error {
 	// receiver will own recvReq channel
 
 	// create sender goroutine
-	go i.sender(ctx, &stream, rptWanted)
+	go n.sender(ctx, &stream, rptWanted)
 
 	// create receiver goroutine
-	go i.receiver(ctx, &stream, recvReq)
+	go n.receiver(ctx, &stream, recvReq)
 
 	// now we just sit and listen on channels until it's time to exit
 	exiting := false
@@ -100,26 +95,23 @@ func (i *idsearcher) NewJob(stream agent.Agent_NewJobServer) error {
 			break
 		case su := <-setStatus:
 			// update status values where filled in
-			if su.run != agent.JobRunStatus_STATUS_SAME {
-				status.run = su.run
+			if su.run != status.Status_STATUS_SAME {
+				st.run = su.run
 			}
-			if su.health != agent.JobHealthStatus_HEALTH_SAME {
-				status.health = su.health
+			if su.health != status.Health_HEALTH_SAME {
+				st.health = su.health
 			}
 			if su.outputMsg != "" {
-				status.outputMessages += su.outputMsg
-			}
-			if su.errorMsg != "" {
-				status.errorMessages += su.errorMsg
+				st.outputMessages += su.outputMsg
 			}
 			// additionally, if run status is now STOPPED, we are finished
 			// and exiting
-			if su.run == agent.JobRunStatus_STOPPED {
-				status.finished = su.now
+			if su.run == status.Status_STOPPED {
+				st.finished = su.now
 				exiting = true
 			}
 			// finally, tell sender to send a status update
-			rptWanted <- rptType{sRpt: true, status: status}
+			rptWanted <- rptType{sRpt: true, status: st}
 		case r, ok := <-recvReq:
 			if !ok {
 				// gRPC reads are now closed; time to wrap up
@@ -128,14 +120,12 @@ func (i *idsearcher) NewJob(stream agent.Agent_NewJobServer) error {
 				break
 			}
 			switch r.t {
-			case reqDescribe:
-				rptWanted <- rptType{dRpt: true}
 			case reqStart:
 				// create agent goroutine
-				go i.runAgent(ctx, *r.cfg, setStatus)
+				go n.runAgent(ctx, *r.cfg, setStatus)
 				createdAgent = true
 			case reqStatus:
-				rptWanted <- rptType{sRpt: true, status: status}
+				rptWanted <- rptType{sRpt: true, status: st}
 			}
 		}
 	}

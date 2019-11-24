@@ -6,7 +6,7 @@ import (
 	"io"
 	"log"
 
-	"github.com/swinslow/peridot-core/pkg/agent"
+	"github.com/swinslow/peridot-jobrunner/pkg/agent"
 )
 
 func (i *idsearcher) receiver(

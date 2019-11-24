@@ -5,7 +5,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/swinslow/peridot-core/pkg/agent"
+	"github.com/swinslow/peridot-jobrunner/pkg/agent"
 )
 
 func (ag *retrieveGithub) getDescribeReport() *agent.DescribeReport {

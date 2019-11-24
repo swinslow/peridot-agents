@@ -6,7 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/swinslow/peridot-core/pkg/agent"
+	"github.com/swinslow/peridot-jobrunner/pkg/agent"
+	"github.com/swinslow/peridot-jobrunner/pkg/status"
 )
 
 type retrieveGithub struct {
@@ -28,8 +29,8 @@ type reqMsg struct {
 }
 
 type statusCurrent struct {
-	run            agent.JobRunStatus
-	health         agent.JobHealthStatus
+	run            status.Status
+	health         status.Health
 	started        time.Time
 	finished       time.Time
 	outputMessages string
@@ -37,8 +38,8 @@ type statusCurrent struct {
 }
 
 type statusUpdate struct {
-	run       agent.JobRunStatus
-	health    agent.JobHealthStatus
+	run       status.Status
+	health    status.Health
 	now       time.Time
 	outputMsg string
 	errorMsg  string
@@ -58,8 +59,8 @@ func (ag *retrieveGithub) NewJob(stream agent.Agent_NewJobServer) error {
 
 	// this main goroutine is responsible for tracking the job's status
 	status := statusCurrent{
-		run:            agent.JobRunStatus_STARTUP,
-		health:         agent.JobHealthStatus_OK,
+		run:            status.Status_STARTUP,
+		health:         status.Health_OK,
 		started:        time.Now(),
 		outputMessages: "",
 		errorMessages:  "",

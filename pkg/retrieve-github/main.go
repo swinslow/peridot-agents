@@ -7,7 +7,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/swinslow/peridot-core/pkg/agent"
+	"github.com/swinslow/peridot-jobrunner/pkg/agent"
 )
 
 const (

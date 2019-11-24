@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/swinslow/peridot-core/pkg/agent"
+	"github.com/swinslow/peridot-jobrunner/pkg/agent"
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )

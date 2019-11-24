@@ -11,7 +11,7 @@ import (
 
 	sid "github.com/spdx/tools-golang/v0/idsearcher"
 	"github.com/spdx/tools-golang/v0/tvsaver"
-	"github.com/swinslow/peridot-core/pkg/agent"
+	"github.com/swinslow/peridot-jobrunner/pkg/agent"
 )
 
 // setStatusError is a helper function to send a statusUpdate
